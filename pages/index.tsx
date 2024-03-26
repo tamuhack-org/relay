@@ -15,7 +15,7 @@ export default function Home() {
 
       <button
         onClick={() => {
-          signIn("google");
+          signI("google");
         }}
       >
         Sign out
