@@ -16,10 +16,10 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    jwt: async ({ token }) => {
+    jwt: ({ token }) => {
       return token;
     },
-    session: async ({ session }) => {
+    session: ({ session }) => {
       return session;
     },
   },
