@@ -1,4 +1,4 @@
-import { signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import {
   Card,
   CardDescription,
@@ -7,18 +7,39 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { GetServerSidePropsContext } from "next";
+import { getSession } from "next-auth/react";
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const session = await getSession(ctx);
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+}
 
 export default function Home() {
   return (
     <div className="flex justify-center h-screen w-screen my-auto">
       <div className="flex flex-col justify-center">
+        <p>Login</p>
         <Card>
           <CardHeader>
             <CardTitle>Welcome</CardTitle>
             <CardDescription>Sign in to Relay</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={() => signOut()}>Sign out with Google</Button>
+            <Button onClick={() => signIn("google")}>
+              Sign in with Google
+            </Button>
           </CardFooter>
         </Card>
       </div>
