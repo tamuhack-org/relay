@@ -1,39 +1,36 @@
 
-import { useRef, useState } from 'react';
-import EmailEditor from 'react-email-editor';
+import { useRef } from 'react';
+import EmailEditor, { EditorRef } from 'react-email-editor';
 
 export default function Editor() {
-    const emailEditorRef = useRef(null);
+    const emailEditorRef = useRef<EditorRef>(null);
 
     const exportHtml = () => {
-        if (!emailEditorRef.current) {
+        if (!emailEditorRef.current || !emailEditorRef.current.editor) {
           return;
         }
       emailEditorRef.current.editor.exportHtml((data) => {
         const { design, html } = data;
         console.log('exportHtml', html);
+        console.log(design);
       });
     };
 
     const saveDesign = () => {
-        if (!emailEditorRef.current) {
+        if (!emailEditorRef.current || !emailEditorRef.current.editor) {
             return;
         }
         emailEditorRef.current.editor.saveDesign((design) => {
             console.log('saveDesign', design);
         });
     };
-
-    
-  
-    const onLoad = () => {
-      // editor instance is created
-      // you can load your template here;
-      
-    }
   
     const onReady = () => {
       // editor is ready
+      if (!emailEditorRef.current || !emailEditorRef.current.editor) {
+        return;
+      }
+      
       console.log('onReady');
       const templateJson = {
         "counters": {
