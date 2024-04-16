@@ -30,7 +30,6 @@ export default function Home() {
   return (
     <div className="flex justify-center h-screen w-screen my-auto">
       <div className="flex flex-col justify-center">
-        <p>Login</p>
         <Card>
           <CardHeader>
             <CardTitle>Welcome</CardTitle>
