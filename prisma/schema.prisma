@@ -29,28 +29,36 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-
 model Project {
-  projectId         String  @id @default(cuid())
-  projectName       String
-  users             User[]
-  admins            User[]
-  lists             MailingList[]
-  templates         EmailTemplate[]
-  members           ListMember[]
-
-  user              User[]
+  projectId   String          @id @default(cuid())
+  projectName String
+  users       User[]          @relation("usersToProjects")
+  admins      User[]          @relation("adminsToProjects")
+  adminId     String[]
+  lists       MailingList[]
+  templates   EmailTemplate[]
+  members     ListMember[]
 }
 
+model EmailTemplate {
+  templateId       String @id @default(cuid())
+  name             String
+  content          String
+  link             String
+  Project          Project? @relation(fields: [projectProjectId], references: [projectId])
+  projectProjectId String?
+}
 
 model User {
-  id              String        @id @default(cuid())
-  name            String?
-  email           String?       @unique
-  emailVerified   DateTime?
-  mailingLists    MailingList[] 
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  mailingLists  MailingList[]
+  userProjects  Project[]     @relation("usersToProjects")
+  adminProjects Project[]     @relation("adminsToProjects")
+  Account       Account[]
 }
-
 
 model MailingList {
   id          Int          @id @default(autoincrement())
@@ -58,28 +66,32 @@ model MailingList {
   description String?
   admins      User[]
   members     ListMember[]
-  project     Project      @relation(fields: [projectId], references: [id])
-  projectId   Int
+  project     Project      @relation(fields: [projectId], references: [projectId])
+  projectId   String
 }
 
 model SentEmail {
-  sentId      string       @id @default(autoincrement())
-  email       string
-  template    SentTemplate[]
-  datetime    datetime
+  sentId   Int            @id @default(autoincrement())
+  email    String
+  template SentTemplate[]
+  datetime DateTime
 }
 
 model SentTemplate {
-  sent        string       @id @default(autoincrement())
-  sentId      Int          @unique
-  datetime    datetime
-  template    string       @relation(fields: [sent], references: [sent_id])
+  sent            Int        @id @default(autoincrement())
+  sentId          Int        @unique
+  datetime        DateTime
+  template        String
+  SentEmail       SentEmail? @relation(fields: [sentEmailSentId], references: [sentId])
+  sentEmailSentId Int?
 }
 
 model ListMember {
-  id            Int           @id @default(autoincrement())
-  email         String
-  mailingLists  MailingList[]
+  id               Int           @id @default(autoincrement())
+  email            String
+  mailingLists     MailingList[]
+  Project          Project?      @relation(fields: [projectProjectId], references: [projectId])
+  projectProjectId String?
 }
 
 model VerificationToken {
