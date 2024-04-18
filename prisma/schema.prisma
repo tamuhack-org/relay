@@ -40,12 +40,12 @@ model Project {
 }
 
 model EmailTemplate {
-  templateId       String   @id @default(cuid())
-  name             String
-  content          String
-  link             String
-  Project          Project? @relation(fields: [projectProjectId], references: [projectId])
-  projectProjectId String?
+  templateId String   @id @default(cuid())
+  name       String
+  content    String
+  link       String
+  Project    Project? @relation(fields: [projectId], references: [projectId])
+  projectId  String?
 }
 
 model User {
@@ -77,20 +77,20 @@ model SentEmail {
 }
 
 model SentTemplate {
-  sent            Int        @id @default(autoincrement())
-  sentId          Int        @unique
-  datetime        DateTime
-  template        String
-  SentEmail       SentEmail? @relation(fields: [sentEmailSentId], references: [sentId])
-  sentEmailSentId Int?
+  sent        Int        @id @default(autoincrement())
+  sentId      Int        @unique
+  datetime    DateTime
+  template    String
+  SentEmail   SentEmail? @relation(fields: [sentEmailId], references: [sentId])
+  sentEmailId Int?
 }
 
 model ListMember {
-  id               Int           @id @default(autoincrement())
-  email            String
-  mailingLists     MailingList[]
-  Project          Project?      @relation(fields: [projectProjectId], references: [projectId])
-  projectProjectId String?
+  id           Int           @id @default(autoincrement())
+  email        String
+  mailingLists MailingList[]
+  Project      Project?      @relation(fields: [projectId], references: [projectId])
+  projectId    String?
 }
 
 model VerificationToken {
