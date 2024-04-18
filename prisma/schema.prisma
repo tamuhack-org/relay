@@ -29,31 +29,28 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String?       @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  mailingLists  MailingList[]
-}
 
 model Project {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String?
-  lists       MailingList[]
+  projectId         String  @id @default(cuid())
+  projectName       String
+  users             User[]
+  admins            User[]
+  lists             MailingList[]
+  templates         EmailTemplate[]
+  members           ListMember[]
+
+  user              User[]
 }
+
+
+model User {
+  id              String        @id @default(cuid())
+  name            String?
+  email           String?       @unique
+  emailVerified   DateTime?
+  mailingLists    MailingList[] 
+}
+
 
 model MailingList {
   id          Int          @id @default(autoincrement())
@@ -65,10 +62,24 @@ model MailingList {
   projectId   Int
 }
 
+model SentEmail {
+  sentId      string       @id @default(autoincrement())
+  email       string
+  template    SentTemplate[]
+  datetime    datetime
+}
+
+model SentTemplate {
+  sent        string       @id @default(autoincrement())
+  sentId      Int          @unique
+  datetime    datetime
+  template    string       @relation(fields: [sent], references: [sent_id])
+}
+
 model ListMember {
-  id           Int           @id @default(autoincrement())
-  email        String
-  mailingLists MailingList[]
+  id            Int           @id @default(autoincrement())
+  email         String
+  mailingLists  MailingList[]
 }
 
 model VerificationToken {
