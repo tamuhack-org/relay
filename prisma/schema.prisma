@@ -29,35 +29,34 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-
 model Project {
-  projectId         String  @id @default(cuid())
-  projectName       String
-  users             User[] @relation("usersToProjects",fields: [userId],references:[id])
-  userId            String[]
-  admins            User[] @relation("adminsToProjects",fields: [adminId],references:[id])
-  adminId           String[]
-  lists             MailingList[]
-  templates         EmailTemplate[]
-  members           ListMember[]
-
+  projectId   String          @id @default(cuid())
+  projectName String
+  users       User[]          @relation("usersToProjects")
+  admins      User[]          @relation("adminsToProjects")
+  lists       MailingList[]
+  templates   EmailTemplate[]
+  members     ListMember[]
 }
 
 model EmailTemplate {
-  templateId      String
-  name            String
-  content         String
-  link            String
+  templateId       String   @id @default(cuid())
+  name             String
+  content          String
+  link             String
+  Project          Project? @relation(fields: [projectProjectId], references: [projectId])
+  projectProjectId String?
 }
 
 model User {
-  id              String        @id @default(cuid())
-  name            String?
-  email           String?       @unique
-  emailVerified   DateTime?
-  mailingLists    MailingList[]
-  userProjects    Project[] @relation("usersToProjects")
-  adminProjects   Project[] @relation("adminsToProjects")
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  mailingLists  MailingList[]
+  userProjects  Project[]     @relation("usersToProjects")
+  adminProjects Project[]     @relation("adminsToProjects")
+  Account       Account[]
 }
 
 model MailingList {
@@ -67,27 +66,31 @@ model MailingList {
   admins      User[]
   members     ListMember[]
   project     Project      @relation(fields: [projectId], references: [projectId])
-  projectId   Int
+  projectId   String
 }
 
 model SentEmail {
-  sentId      Int       @id @default(autoincrement())
-  email       String
-  template    SentTemplate[]
-  datetime    DateTime
+  sentId   Int            @id @default(autoincrement())
+  email    String
+  template SentTemplate[]
+  datetime DateTime
 }
 
 model SentTemplate {
-  sent        Int       @id @default(autoincrement())
-  sentId      Int          @unique
-  datetime    DateTime
-  template    String      
+  sent            Int        @id @default(autoincrement())
+  sentId          Int        @unique
+  datetime        DateTime
+  template        String
+  SentEmail       SentEmail? @relation(fields: [sentEmailSentId], references: [sentId])
+  sentEmailSentId Int?
 }
 
 model ListMember {
-  id            Int           @id @default(autoincrement())
-  email         String
-  mailingLists  MailingList[]
+  id               Int           @id @default(autoincrement())
+  email            String
+  mailingLists     MailingList[]
+  Project          Project?      @relation(fields: [projectProjectId], references: [projectId])
+  projectProjectId String?
 }
 
 model VerificationToken {
