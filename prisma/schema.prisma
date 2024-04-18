@@ -36,7 +36,6 @@ model Project {
   admins      User[]          @relation("adminsToProjects")
   lists       MailingList[]
   templates   EmailTemplate[]
-  members     ListMember[]
 }
 
 model EmailTemplate {
@@ -67,13 +66,16 @@ model MailingList {
   members     ListMember[]
   project     Project      @relation(fields: [projectId], references: [projectId])
   projectId   String
+  sentEmail   SentEmail[]
 }
 
 model SentEmail {
-  sentId   Int            @id @default(autoincrement())
-  email    String
-  template SentTemplate[]
-  datetime DateTime
+  sentId        Int            @id @default(autoincrement())
+  email         String
+  template      SentTemplate[]
+  datetime      DateTime
+  mailingList   MailingList?   @relation(fields: [mailingListId], references: [id])
+  mailingListId Int?
 }
 
 model SentTemplate {
@@ -89,8 +91,6 @@ model ListMember {
   id           Int           @id @default(autoincrement())
   email        String
   mailingLists MailingList[]
-  Project      Project?      @relation(fields: [projectId], references: [projectId])
-  projectId    String?
 }
 
 model VerificationToken {
