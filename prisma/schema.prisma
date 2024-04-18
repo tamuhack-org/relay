@@ -40,12 +40,12 @@ model Project {
 }
 
 model EmailTemplate {
-  templateId       String   @id @default(cuid())
-  name             String
-  content          String
-  link             String
-  Project          Project? @relation(fields: [projectProjectId], references: [projectId])
-  projectProjectId String?
+  templateId String   @id @default(cuid())
+  name       String
+  content    String
+  link       String
+  Project    Project? @relation(fields: [projectId], references: [projectId])
+  projectId  String?
 }
 
 model User {
