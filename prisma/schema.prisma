@@ -86,11 +86,11 @@ model SentTemplate {
 }
 
 model ListMember {
-  id               Int           @id @default(autoincrement())
-  email            String
-  mailingLists     MailingList[]
-  Project          Project?      @relation(fields: [projectProjectId], references: [projectId])
-  projectProjectId String?
+  id           Int           @id @default(autoincrement())
+  email        String
+  mailingLists MailingList[]
+  Project      Project?      @relation(fields: [projectId], references: [projectId])
+  projectId    String?
 }
 
 model VerificationToken {
