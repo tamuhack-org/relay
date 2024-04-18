@@ -42,13 +42,6 @@ model Project {
   user              User[]
 }
 
-model MailingList {
-  listId       String   @id @default(cuid())
-  listName     String   @unique
-  projectId    String
-  admins       DateTime
-  members      ListMember[]
-}
 
 model User {
   id              String        @id @default(cuid())
@@ -58,12 +51,6 @@ model User {
   mailingLists    MailingList[] 
 }
 
-model Project {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String?
-  lists       MailingList[]
-}
 
 model MailingList {
   id          Int          @id @default(autoincrement())
