@@ -34,14 +34,13 @@ model Project {
   projectName String
   users       User[]          @relation("usersToProjects")
   admins      User[]          @relation("adminsToProjects")
-  adminId     String[]
   lists       MailingList[]
   templates   EmailTemplate[]
   members     ListMember[]
 }
 
 model EmailTemplate {
-  templateId       String @id @default(cuid())
+  templateId       String   @id @default(cuid())
   name             String
   content          String
   link             String
