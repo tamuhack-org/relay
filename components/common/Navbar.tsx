@@ -14,6 +14,7 @@ import { signOut } from "next-auth/react";
 const Navbar = () => {
   const { data: session } = useSession();
 
+
   return (
     <div className="flex items-center justify-between h-12 border border-b-slate-300 px-4">
       {/* Left Side */}
@@ -21,6 +22,7 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="flex gap-4">
+        <p>{session?.user?.name}</p>
         <p className="font-sans">Subscription</p>
         <DropdownMenu>
           <DropdownMenuTrigger>

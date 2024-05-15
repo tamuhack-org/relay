@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import prisma from '../../../lib/prisma';
+import prisma from '@/lib/prisma';
 import { Project } from '@prisma/client';
 import { getToken } from 'next-auth/jwt';
 
@@ -12,7 +12,6 @@ export default async function handler(
   res: NextApiResponse<{ projects: Project[] }>
 ) {
   const token = await getToken({ req });
-  const { ticketId } = req.body;
 
   if (!token) {
     res.status(401);
@@ -20,48 +19,16 @@ export default async function handler(
     return;
   }
 
-  const user = await prisma.user.findUnique({
+  const projects = await prisma.project.findMany({
     where: {
-      email: token?.email || '',
-    },
-    include: {
-      
-    },
-  });
-
-  const ticket = await prisma.ticket.findUnique({
-    where: {
-      id: ticketId,
-    },
-  });
-
-  if (!user || !ticket || (!user.admin && !user.mentor)) {
-    res.status(401);
-    res.send({ ticket: null });
-    return;
-  }
-
-  if (user.claimedTicket || ticket.claimantId) {
-    res.status(400);
-    res.send({ ticket: null });
-    return;
-  }
-
-  await prisma.ticket.update({
-    where: {
-      id: ticketId,
-    },
-    data: {
-      claimantName: user.name,
-      claimedTime: new Date(),
-      claimant: {
-        connect: {
-          id: user.id,
+      users: {
+        some: {
+          email: token.email,
         },
       },
     },
   });
 
   res.status(200);
-  res.send({ ticket: ticket });
+  res.send({ projects });
 }
