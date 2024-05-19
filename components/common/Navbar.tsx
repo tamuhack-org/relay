@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const Navbar = () => {
   const { data: session } = useSession();
 
+
   return (
     <div className="flex items-center justify-between h-16 border border-b-slate-300 p-4">
       {/* Left Side */}
@@ -24,6 +25,8 @@ const Navbar = () => {
       {/* Right Side */}
       <div className="flex gap-4">
         <Input placeholder="Search" />
+        <p>{session?.user?.name}</p>
+        <p className="font-sans">Subscription</p>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>

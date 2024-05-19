@@ -1,27 +1,34 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '../../../lib/prisma';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+import prisma from '@/lib/prisma';
+import { Project } from '@prisma/client';
+import { getToken } from 'next-auth/jwt';
+
+/*
+ * GET Request: Get all projects that the user is a part of.
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{ projects: Project[] }>
+) {
+  const token = await getToken({ req });
+
+  if (!token) {
+    res.status(401);
+    res.send({ projects: [] });
+    return;
   }
 
-  try {
-    const { userId } = req.query;
-
-    const projects = await prisma.project.findMany({
-      where: {
-        members: {
-          some: {
-            userId: parseInt(userId as string),
-          },
+  const projects = await prisma.project.findMany({
+    where: {
+      users: {
+        some: {
+          email: token.email,
         },
       },
-    });
+    },
+  });
 
-    return res.status(200).json(projects);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
+  res.status(200);
+  res.send({ projects });
 }

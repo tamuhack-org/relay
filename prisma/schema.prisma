@@ -60,7 +60,7 @@ model User {
 }
 
 model MailingList {
-  id          Int          @id @default(autoincrement())
+  id          String          @id @default(cuid())
   name        String
   description String?
   admins      User[]
@@ -71,25 +71,25 @@ model MailingList {
 }
 
 model SentEmail {
-  sentId        Int            @id @default(autoincrement())
+  sentId        String            @id @default(cuid())
   email         String
   template      SentTemplate[]
   datetime      DateTime
   mailingList   MailingList?   @relation(fields: [mailingListId], references: [id])
-  mailingListId Int?
+  mailingListId String?
 }
 
 model SentTemplate {
-  sent        Int        @id @default(autoincrement())
+  sent        String        @id @default(cuid())
   sentId      Int        @unique
   datetime    DateTime
   template    String
   SentEmail   SentEmail? @relation(fields: [sentEmailId], references: [sentId])
-  sentEmailId Int?
+  sentEmailId String?
 }
 
 model ListMember {
-  id           Int           @id @default(autoincrement())
+  id           String           @id @default(cuid())
   email        String
   mailingLists MailingList[]
 }

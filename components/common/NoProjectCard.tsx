@@ -8,11 +8,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-const NoProjectCard = () => {
+type NoProjectCardProps = {
+  onClick: () => void;
+};
+
+export default function NoProjectCard(props: NoProjectCardProps) {
+  
+
   return (
     <div className="flex justify-center h-screen w-screen my-auto">
       <div className="flex flex-col justify-center">
-        <p>Login</p>
         <Card>
           <CardHeader>
             <CardTitle>No Projects</CardTitle>
@@ -21,12 +26,10 @@ const NoProjectCard = () => {
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button>Create Project</Button>
+            <Button onClick={props.onClick}>Create Project</Button>
           </CardFooter>
         </Card>
       </div>
     </div>
   );
 };
-
-export default NoProjectCard;
