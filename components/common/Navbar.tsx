@@ -10,27 +10,26 @@ import {
 
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
+import { Input } from "../ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const Navbar = () => {
   const { data: session } = useSession();
 
   return (
-    <div className="flex items-center justify-between h-12 border border-b-slate-300 px-4">
+    <div className="flex items-center justify-between h-16 border border-b-slate-300 p-4">
       {/* Left Side */}
       <div></div>
 
       {/* Right Side */}
       <div className="flex gap-4">
-        <p className="font-sans">Subscription</p>
+        <Input placeholder="Search" />
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Image
-              src={session?.user?.image || ""}
-              alt="User Image"
-              width={30}
-              height={30}
-              className="rounded-full"
-            />
+            <Avatar>
+              <AvatarImage src={session?.user?.image || ""} alt="avatar" />
+              <AvatarFallback>{session?.user?.name?.charAt(0)}</AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mr-4">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
