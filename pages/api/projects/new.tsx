@@ -11,6 +11,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<{ newProject: Project | null }>
 ) {
+
+  if (req.method !== 'POST') {
+    res.status(405);
+    res.send({ newProject: null });
+    return;
+  }
+
   const token = await getToken({ req });
 
   if (!token || !token.email) {
