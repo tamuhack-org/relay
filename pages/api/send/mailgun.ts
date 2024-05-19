@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { getToken } from 'next-auth/jwt';
+// import { getToken } from 'next-auth/jwt';
 import Mailgun from 'mailgun.js';
 
 export type SendStatus = {
@@ -45,12 +45,21 @@ export default async function handler(
   const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || "" });
 
   try {
+    // Recipient variables are used to send personalized emails to each recipient
+    // They could be used for templating
+    // But right now they're just being used so it doesn't show every recipient's email address in the "to" field
+    let recipientVariables: any = {};
+    for (const email of emailAddresses) {
+      recipientVariables[email] = { "a": 0 };
+    }
+
     const response = await mg.messages.create(process.env.MAILGUN_DOMAIN || "", {
       from: "TAMUhack <hello@tamuhack.com>",  // TODO use a name configured in the Project settings
       to: emailAddresses,
       subject: "Test Email from Relay!",
       text: message,
       html: `<h1>${message}</h1><p>Relay go brrrr</p>`,
+      "recipient-variables": JSON.stringify(recipientVariables),
     });
     console.log(response);
     res.status(200);
