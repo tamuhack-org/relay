@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import {
   Card,
   CardDescription,
@@ -5,16 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import NewProjectButton from "./NewProjectButton";
 
-import { Button } from "@/components/ui/button";
+interface NoProjectCardProps {
+  createProject: (projectName: string) => void;
+}
 
-type NoProjectCardProps = {
-  onClick: () => void;
-};
-
-export default function NoProjectCard(props: NoProjectCardProps) {
-  
-
+export default function NoProjectCard({ createProject }: NoProjectCardProps) {
   return (
     <div className="flex justify-center h-screen w-screen my-auto">
       <div className="flex flex-col justify-center">
@@ -26,7 +25,7 @@ export default function NoProjectCard(props: NoProjectCardProps) {
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={props.onClick}>Create Project</Button>
+            <NewProjectButton createProject={createProject} />
           </CardFooter>
         </Card>
       </div>

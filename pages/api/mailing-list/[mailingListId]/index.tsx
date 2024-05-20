@@ -25,7 +25,7 @@ export default async function handler(
 
   const mailinglist: MailingList | null = await prisma.mailingList.findFirst({
     where: {
-      id: mailingListId as string,
+      id: Number(mailingListId),
     },
   });
 

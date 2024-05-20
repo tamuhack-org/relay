@@ -32,9 +32,11 @@ export default async function handler(
   }
 
   try {
+    const projectName = req.body.projectName;
+
     const newProject = await prisma.project.create({
     data: {
-        projectName: "New Project",
+        projectName: projectName,
         users: {
           connect: {
             email: user.email,
