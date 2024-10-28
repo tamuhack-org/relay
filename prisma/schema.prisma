@@ -10,7 +10,15 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
-model Account {
+model VerificationToken {  // Managed by next-auth
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Account {  // Managed by next-auth
   id                String  @id @default(cuid())
   userId            String
   type              String
@@ -29,75 +37,101 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Project {
-  projectId   String          @id @default(cuid())
-  projectName String
-  users       User[]          @relation("usersToProjects")
-  admins      User[]          @relation("adminsToProjects")
-  lists       MailingList[]
-  templates   EmailTemplate[]
-}
-
-model EmailTemplate {
-  templateId String   @id @default(cuid())
-  name       String
-  content    String
-  link       String
-  Project    Project? @relation(fields: [projectId], references: [projectId])
-  projectId  String?
-}
-
 model User {
-  id            String        @id @default(cuid())
+  userProjects         Project[]       @relation("UserToProject")  // We have to specify the relation name because users and admins are both Users[]
+  adminProjects        Project[]       @relation("AdminToProject") // We have to specify the relation name because users and admins are both Users[]
+  lastUpdatedTemplates EmailTemplate[]
+  lastUpdatedLists     MailingList[]
+  sentEmailsInitiated  SentEmail[]
+
+  // Managed by next-auth
+  id            String    @id @default(cuid())
   name          String?
-  email         String?       @unique
+  email         String?   @unique
   image         String?
   emailVerified DateTime?
-  mailingLists  MailingList[]
-  userProjects  Project[]     @relation("usersToProjects")
-  adminProjects Project[]     @relation("adminsToProjects")
   Account       Account[]
 }
 
-model MailingList {
+model Project {
   id          String          @id @default(cuid())
-  name        String
-  description String?
-  admins      User[]
-  members     ListMember[]
-  project     Project      @relation(fields: [projectId], references: [projectId])
-  projectId   String
-  sentEmail   SentEmail[]
+  projectName String
+  users       User[]          @relation("UserToProject")  // We have to specify the relation name because users and admins are both Users[]
+  admins      User[]          @relation("AdminToProject") // We have to specify the relation name because users and admins are both Users[]
+  lists       MailingList[]
+  templates   EmailTemplate[]
+  sentEmails  SentEmail[]
+  listMembers ListMember[]
+}
+
+model EmailTemplate {
+  id                  String   @id @default(cuid())
+  name                String
+  description         String
+  s3Url               String
+  lastUpdatedTime     DateTime  // TODO when updating, check if this is newer than when current user started editing and warn them
+  project             Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId           String?
+  sentEmailsUsing     SentEmail[]
+  lastUpdatedByUserId String?
+  lastUpdatedBy       User?   @relation(fields: [lastUpdatedByUserId], references: [id], onDelete: SetNull)
+}
+
+
+
+model MailingList {
+  id                  String       @id @default(cuid())
+  name                String
+  description         String
+  lastUpdated         DateTime
+  members             ListMember[]
+  sentEmails          SentEmail[]
+
+  project             Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId           String
+
+  lastUpdatedByUserId String?
+  lastUpdatedBy       User?        @relation(fields: [lastUpdatedByUserId], references: [id], onDelete: SetNull)
 }
 
 model SentEmail {
-  sentId        String            @id @default(cuid())
-  email         String
-  template      SentTemplate[]
-  datetime      DateTime
-  mailingList   MailingList?   @relation(fields: [mailingListId], references: [id])
-  mailingListId String?
-}
+  id                String            @id @default(cuid())
 
-model SentTemplate {
-  sent        String        @id @default(cuid())
-  sentId      Int        @unique
-  datetime    DateTime
-  template    String
-  SentEmail   SentEmail? @relation(fields: [sentEmailId], references: [sentId])
-  sentEmailId String?
+  // "Templates" and "SentTemplates" are different
+  // Templates:
+  //   - are stored in the EmailTemplate table, with the content stored in S3
+  //   - can edited by users
+  //   - are used to create SentTemplates
+  // SentTemplates:
+  //   - (!!!) represent the state of the EmailTemplate at the time of sending
+  //   - are created and stored in S3 when a user sends an email; one SentTemplate per SentEmail
+  //   - are for viewing only
+  sentTemplateS3Url String
+  recipients        ListMember[]
+
+  initiatedTime     DateTime  // TODO if the template or mailing list is updated after this time, show in the UI
+  completedTime     DateTime?
+
+  project           Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId         String?
+  mailingList       MailingList?   @relation(fields: [mailingListId], references: [id], onDelete: SetNull)
+  mailingListId     String?
+  template          EmailTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  templateId        String?
+  initiatedBy       User?          @relation(fields: [initiatedByUserId], references: [id], onDelete: SetNull)
+  initiatedByUserId String?
 }
 
 model ListMember {
-  id           String           @id @default(cuid())
-  email        String
-  mailingLists MailingList[]
+  id                  String        @id @default(cuid())
+  emailAddress        String
+  project             Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId           String
+  mailingLists        MailingList[]
+  receivedEmails      SentEmail[]
+  manuallyAdded       Boolean
+  selfSignedUp        Boolean
+  confirmedSelfSignup Boolean
+  unsubscribed        Boolean
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}

@@ -6,6 +6,7 @@ import { getToken } from 'next-auth/jwt';
 
 /*
  * GET Request: Get the project specified by the projectId in the URL.
+ * DELETE Request: Delete the project specified by the projectId in the URL.
  */
 
 export type FullProject = Project & {
@@ -45,6 +46,28 @@ export default async function handler(
     },
   });
 
-  res.status(200);
-  res.send({ fullProject });
+  if (!fullProject) {
+    res.status(404);
+    res.send({ fullProject: null });
+    return;
+  }
+
+  if (req.method === 'DELETE')
+  {
+    // Prisma's cascading delete will take care of deleting all the associated data
+    await prisma.project.delete({
+      where: {
+        id: projectId as string,
+      },
+    });
+  }
+  else if (req.method !== 'GET') {
+    res.status(200);
+    res.send({ fullProject });
+  }
+  else
+  {
+    res.status(405);
+    res.send({ fullProject: null });
+  }
 }

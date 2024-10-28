@@ -64,6 +64,8 @@ export default async function handler(
     console.log(response);
     res.status(200);
     res.send({ success: true, message: "Email sent!" });
+    // TODO the sender and all admins should get an confirmation email that the email was sent
+    // They should be notified of job status, sweeping changes, etc.
   }
   catch (e) {
     console.error(e);
