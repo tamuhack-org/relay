@@ -31,7 +31,7 @@ export default async function handler(
 
   const fullProject: FullProject | null = await prisma.project.findFirst({
     where: {
-      projectId: projectId as string,
+      id: projectId as string,
       users: {
         some: {
           email: token.email,
